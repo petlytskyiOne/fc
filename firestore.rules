@@ -1,0 +1,20 @@
+// Правила для колекцій флеш-карток.
+// УВАГА: якщо Firebase-проєкт спільний з іншим застосунком, НЕ замінюйте ними
+// наявні правила — додайте два блоки match нижче всередину існуючого
+// `match /databases/{database}/documents { ... }`.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Картки читають лише авторизовані користувачі; записує їх тільки npm run seed (Admin SDK)
+    match /nkcpfr_cards/{cardId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Кожен користувач читає і змінює лише власні дані: прогрес і денну статистику
+    match /nkcpfr_users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

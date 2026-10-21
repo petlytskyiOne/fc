@@ -1,0 +1,39 @@
+{
+  "name": "nkcpfr-flashcards",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "cards": "node scripts/parse-cards.mjs",
+    "seed": "npm run cards && node scripts/seed-firestore.mjs",
+    "template": "node scripts/make-template.mts",
+    "dev": "npm run cards && vite",
+    "build": "npm run cards && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "android:add": "cap add android",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "cap open android",
+    "android:apk": "npm run android:sync && cd android && .\\gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
+    "@solidjs/router": "^1.0.0",
+    "dompurify": "^3.4.17",
+    "firebase": "^13.0.0",
+    "marked": "^18.1.1",
+    "solid-js": "^1.9.17"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^26.6.5",
+    "firebase-admin": "^14.5.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vite-plugin-solid": "^2.11.14"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+dist
+app/
+.env
+service-account*.json
+android/app/build
+android/.gradle
+android/local.properties
+android/.kotlin
+# ключі підпису Android — лише локально
+*.jks
+*.keystore
+# особисті налаштування Claude Code
+.claude/settings.local.json

@@ -1,0 +1,2804 @@
+/* ================= Tokens ================= */
+/* Палітра й типографіка — як у myDay (стиль shelf): одна темна тема, тонкі рамки замість тіней */
+:root {
+  color-scheme: dark;
+  --bg: #242424;
+  --sidebar: #18181f;
+  --surface: #2c2c2c; /* картки */
+  --surface-2: #323232; /* плашки всередині карток, наведення */
+  --surface-3: #3a3a3a;
+  --text: #e8e8f0;
+  --text-2: #9090a8;
+  --muted: #72728a;
+  --faint: #55556a;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-2: rgba(255, 255, 255, 0.13);
+  --accent: rgb(33, 105, 235);
+  --accent-strong: #5b91f0;
+  --accent-text: #ffffff;
+  --accent-soft: rgba(33, 105, 235, 0.1);
+  --accent-border: rgba(33, 105, 235, 0.35);
+  --danger: #ff5c5c;
+  --good-text: #3ecf8e;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  /* тіней немає — поверхні окреслені рамкою --border */
+  --shadow: none;
+  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --nav-h: 68px;
+
+  --font: 'Syne', system-ui, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, monospace;
+
+  /* Графіки: категоріальні слоти 1–2 (перевірено валідатором для темного тла) */
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-grid: #3a3a3a;
+  --viz-axis: #4a4a4a;
+  /* Оцінки: Не знаю / Важко / Знаю / Легко */
+  --g0: #d55181;
+  --g1: #c98500;
+  --g2: #199e70;
+  --g3: #3987e5;
+  /* Стан карток — порядкова синя шкала, «нові» нейтральні */
+  --st0: #4a4a52;
+  --st1: #256abf;
+  --st2: #3987e5;
+  --st3: #9ec5f4;
+  /* Теплова карта — послідовна синя шкала */
+  --heat-0: #323232;
+  --heat-1: #184f95;
+  --heat-2: #256abf;
+  --heat-3: #3987e5;
+  --heat-4: #9ec5f4;
+}
+
+/* ================= Base ================= */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.45 var(--font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* Скролбар як у myDay */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 2px;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+h1 {
+  font-size: 1.6rem;
+}
+
+h2 {
+  font-size: 1.05rem;
+}
+
+code {
+  background: var(--surface-2);
+  padding: 0 4px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.center {
+  text-align: center;
+  justify-content: center;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ================= Shell & navigation ================= */
+.shell {
+  min-height: 100vh;
+}
+
+.content {
+  min-height: 100vh;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
+}
+
+.shell.focus .content {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 10px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-brand,
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+/* Назва застосунку — як .brandName у myDay */
+.nav-brand,
+.topbar-brand {
+  color: var(--accent-strong);
+}
+
+.pill {
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.banner {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  background: var(--accent-soft);
+}
+
+/* Нижнє меню (телефон) */
+.nav {
+  position: fixed;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding: 6px 6px env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border-top: 1px solid var(--border);
+}
+
+.nav-brand {
+  display: none;
+}
+
+.nav-item {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  border-radius: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.nav-item svg {
+  padding: 3px 16px;
+  width: 56px;
+  height: 30px;
+  border-radius: 999px;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+.nav-item.active {
+  color: var(--accent);
+}
+
+.nav-item.active svg {
+  background: var(--accent-soft);
+}
+
+.shell.focus .nav {
+  display: none;
+}
+
+/* Бічне меню (планшет / комп'ютер) */
+@media (min-width: 900px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+  }
+
+  .nav,
+  .shell.focus .nav {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100vh;
+    padding: 24px 16px;
+    border-top: 0;
+    border-right: 1px solid var(--border);
+    background: var(--sidebar);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .nav-brand {
+    display: flex;
+    padding: 0 8px 40px;
+  }
+
+  .nav-item {
+    position: relative;
+    display: flex;
+    justify-items: start;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-xs);
+    font-size: 14px;
+    color: var(--text-2);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: none !important;
+  }
+
+  .nav-item:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+
+  /* Активний пункт — «корінець» як у myDay */
+  .nav-item.active,
+  .nav-item.active:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+
+  .topbar {
+    display: none;
+  }
+
+  .content,
+  .shell.focus .content {
+    padding-bottom: 32px;
+  }
+}
+
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Сторінки з плитками — на всю ширину вікна (сторінки для читання лишаються вузькими) */
+.page.wide {
+  max-width: none;
+}
+
+@media (min-width: 900px) {
+  .page.wide {
+    padding: 32px 40px;
+  }
+}
+
+@media (min-width: 900px) {
+  .page {
+    padding: 32px 24px;
+  }
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.splash {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ================= Buttons ================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: transform 0.1s, background 0.15s, border-color 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-text);
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.btn.ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn.ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.btn.block {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+.link {
+  border: 0;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 8px 0;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ================= Auth ================= */
+.auth {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 16px;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
+    var(--bg);
+}
+
+.auth-lang {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: 16px;
+}
+
+.note {
+  margin: -8px 0 4px;
+}
+
+.list-row.align {
+  align-items: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.brand h1 {
+  font-size: 1.6rem;
+}
+
+.brand p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.tabs button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tabs button.active {
+  background: var(--surface);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.form label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--text-2);
+}
+
+.form input,
+.search {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-2);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.search::placeholder {
+  color: var(--faint);
+}
+
+.form input:focus,
+.search:focus {
+  border-color: var(--accent);
+}
+
+.alert {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.alert.error {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.alert.info {
+  background: var(--accent-soft);
+}
+
+/* ================= Home ================= */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border-radius: var(--radius);
+  color: var(--text);
+  /* акцентна картка myDay — синій відтінок із тонкою рамкою */
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent-border);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(33, 105, 235, 0.08);
+  pointer-events: none;
+}
+
+.hero-greeting {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero-number {
+  font-size: 3.4rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.hero-caption {
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+.hero-ring {
+  --pct: 0;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--pct) * 1%), rgba(255, 255, 255, 0.08) 0);
+}
+
+.hero-ring span {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+.hero-ring small {
+  font-family: var(--font);
+  font-weight: 400;
+  font-size: 0.65rem;
+  color: var(--text-2);
+}
+
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-glass {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 0.82rem;
+}
+
+.btn.hero-btn {
+  background: var(--accent);
+  color: var(--accent-text);
+  border: 0;
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.btn.hero-btn:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.btn.hero-btn:disabled {
+  background: var(--surface-3);
+  color: var(--muted);
+  opacity: 1;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 28px 2px 12px;
+}
+
+/* Головна: розділи (¾) ліворуч, повторення й аналіз (¼) праворуч, однакової висоти;
+   вузько — одна колонка, повторення вгорі (як «Мій день» у myDay) */
+.home-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'side' 'head' 'main';
+  gap: 16px;
+}
+
+.home-layout .deck-head {
+  grid-area: head;
+}
+
+.home-main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.home-side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* картки колонки не стискаються — якщо не вміщаються, колонка гортається */
+.home-side > * {
+  flex-shrink: 0;
+}
+
+/* Права колонка «Вчити» — компактно, щоб повторення й аналіз уміщались у вікно без прокрутки */
+.home-side {
+  gap: 12px;
+}
+
+.home-side .hero {
+  gap: 12px;
+  padding: 18px;
+}
+
+.home-side .hero-btn {
+  min-height: 42px;
+}
+
+.home-side .analysis {
+  gap: 10px;
+}
+
+.home-side .analysis-block {
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+/* «Сьогодні» — чотири цифри в один рядок */
+.home-side .analysis-figures {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.home-side .analysis-figures div {
+  padding: 6px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.home-side .analysis-figures strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.home-side .analysis-figures span {
+  font-size: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.home-side .analysis-bars {
+  gap: 4px;
+}
+
+.home-side .analysis-bar {
+  gap: 2px 8px;
+}
+
+.home-side .analysis-day-bar {
+  height: 40px;
+}
+
+.home-side .analysis-day {
+  gap: 2px;
+  padding: 2px 0;
+}
+
+/* «Статистика →» уже є над розділами */
+.home-side .analysis-week-block > .link {
+  display: none;
+}
+
+/* Телефон: на «Вчити» — лише розділи; повторення й аналіз — на комп'ютері */
+@media (max-width: 899px) {
+  .home-side {
+    display: none;
+  }
+}
+
+/* Шапка розділів: назва активної колоди і перемикач колод */
+.deck-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 28px 2px 14px;
+}
+
+.deck-head-title {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.deck-head-title h2 {
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+/* Комп'ютер: усе в одному вікні, як у myDay. Сторінка рівно у висоту вікна й сама не гортається;
+   розділи й права колонка починаються на одному рівні та йдуть до низу екрана,
+   а що не вміщається — гортається всередині своєї колонки */
+@media (min-width: 1100px) and (min-height: 600px) {
+  .content:has(.page.wide.fit) {
+    padding-bottom: 0;
+  }
+
+  .page.fit {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .page.fit .home-layout {
+    flex: 1;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .page.fit .home-main,
+  .page.fit .home-side {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* місце під тонкий скролбар, щоб він не наїжджав на рамки карток */
+  .page.fit .home-side {
+    padding-right: 6px;
+  }
+}
+
+@media (min-width: 1100px) {
+  /* назва колоди — над обома колонками, тож верх розділів і верх повторення на одному рівні */
+  .home-layout {
+    grid-template-columns: minmax(0, 3fr) minmax(300px, 1fr);
+    grid-template-areas:
+      'head head'
+      'main side';
+    align-items: stretch;
+  }
+
+  /* у вузькій колонці повторення компактніше */
+  .home-side .hero {
+    padding: 18px;
+  }
+
+  .home-side .hero-number {
+    font-size: 2.4rem;
+  }
+
+  .home-side .hero-ring {
+    width: 68px;
+    height: 68px;
+  }
+
+  .home-side .hero-ring span {
+    width: 54px;
+    height: 54px;
+    font-size: 0.9rem;
+  }
+
+  .home-layout .deck-head {
+    margin: 0 2px;
+  }
+}
+
+/* Аналіз — плитки: кожен блок окремою карткою; скільки вміститься в ряд — залежно від ширини
+   (на «Вчити» у вузькій колонці — одна під одною, при навчанні — кілька в ряд) */
+.analysis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.analysis-head {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+  margin: 0 2px;
+}
+
+.analysis-head h2 {
+  font-size: 18px;
+}
+
+.analysis-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* тиждень — на всю ширину ряду, під іншими плитками */
+.analysis-week-block {
+  grid-column: 1 / -1;
+}
+
+/* у тижня внизу — посилання на статистику */
+.analysis-week-block > .link {
+  margin-top: auto;
+}
+
+.analysis-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.analysis-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.analysis-figures div {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.analysis-figures strong {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.analysis-figures span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.analysis-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analysis-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.analysis-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.analysis-label i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.analysis-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.analysis-track {
+  grid-column: 1 / -1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.analysis-track span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.analysis-week-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.analysis-week-head .analysis-value {
+  color: var(--text-2);
+}
+
+.analysis-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.analysis-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border-radius: var(--radius-xs);
+}
+
+.analysis-day.today {
+  background: var(--surface-2);
+}
+
+.analysis-day-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 64px;
+}
+
+.analysis-day-bar span {
+  width: min(16px, 60%);
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: rgba(91, 156, 255, 0.45);
+  transition: height 0.4s ease;
+}
+
+.analysis-day.today .analysis-day-bar span {
+  background: #5b9cff;
+}
+
+.analysis-day-name {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.analysis-day.today .analysis-day-name {
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.analysis-day-n {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Підпис над групою блоків — як .eyebrow у myDay */
+.section-heading {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Розділи — плитки, як метрики в myDay: 2 в ряд на телефоні, скільки влізе на ширшому екрані */
+.sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .sections {
+    /* auto-fill: порожні колонки лишаються, тож плитка завжди свого розміру,
+       навіть коли розділ один (не розтягується на весь ряд) */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+.section-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.section-card:hover {
+  border-color: var(--border-2);
+  transform: translateY(-1px);
+}
+
+.section-card header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* вивчено / усього — моноширинним, як значення цілей у myDay */
+.section-score {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.section-card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-card h3 {
+  font-size: 15px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  /* довгі назви — не більше трьох рядків, щоб плитки були однакові */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.section-card p {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.section-actions {
+  display: grid;
+  gap: 4px;
+}
+
+.section-actions .btn {
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.section-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 12px;
+}
+
+.section-links .link {
+  padding: 4px 0;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.section-links .link:hover {
+  color: var(--text);
+}
+
+@media (max-width: 639px) {
+  .section-card {
+    padding: 14px;
+  }
+}
+
+.badge {
+  flex: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.meter {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.meter.thin {
+  height: 6px;
+}
+
+.meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in srgb, var(--accent) 35%, var(--surface-3));
+  border-radius: inherit;
+  transition: width 0.4s ease;
+}
+
+.meter-fill.strong {
+  background: var(--accent);
+}
+
+/* ================= Study ================= */
+.study-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Аналіз праворуч — лише на широкому екрані; на телефоні навчання без відволікань */
+.study-body > .analysis {
+  display: none;
+}
+
+/* Комп'ютер: шапка з прогресом на всю ширину; під нею ліворуч картка (від лівого краю, вирівняна з «Назад»),
+   праворуч аналіз — як на «Вчити». Картка стоїть на сталій відстані під шапкою: відкрита відповідь її не зсуває,
+   довга відповідь просто розтягує сторінку */
+@media (min-width: 900px) {
+  .page.study {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    min-height: calc(100vh - 32px);
+    min-height: calc(100dvh - 32px);
+    padding-inline: 40px;
+  }
+
+  .study-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    padding-top: 6vh;
+  }
+
+  .study-stage {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .study-stage .flashcard {
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1100px) {
+  /* картка — до ширини, зручної для читання; аналіз — уся решта ширини, впритул до картки */
+  .study-body {
+    grid-template-columns: minmax(0, 1100px) minmax(340px, 1fr);
+  }
+
+  /* аналіз лишається на місці, поки гортається довга відповідь */
+  .study-body > .analysis {
+    display: grid;
+    position: sticky;
+    top: 48px;
+  }
+
+  /* заголовок «Аналіз» — над плитками, у відступі під шапкою: верх плиток на рівні верху картки */
+  .study-body > .analysis .analysis-head {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    margin-bottom: 10px;
+  }
+}
+
+.study-title {
+  display: grid;
+  text-align: center;
+  min-width: 0;
+}
+
+.study-title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.counter {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  padding-right: 4px;
+  font-weight: 600;
+}
+
+.flashcard {
+  margin-top: 12px;
+  padding: 22px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: card-in 0.25s ease;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+}
+
+.flashcard-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.question {
+  font-size: 1.3rem;
+}
+
+.reveal {
+  margin-top: 28px;
+}
+
+.flashcard hr {
+  border: 0;
+  border-top: 1px dashed var(--surface-3);
+  margin: 20px 0;
+}
+
+.status {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.grades {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 14px 0 calc(env(safe-area-inset-bottom) + 12px);
+  background: linear-gradient(transparent, var(--bg) 30%);
+}
+
+.grade {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 2px;
+  padding: 12px 4px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  transition: transform 0.1s;
+}
+
+.grade::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--key);
+}
+
+.grade:active {
+  transform: scale(0.96);
+}
+
+.grade small {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.empty {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 8px 0 16px;
+}
+
+.summary-item {
+  display: grid;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ================= Browse ================= */
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 0;
+  scrollbar-width: none;
+}
+
+.chip {
+  flex: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chip.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-text);
+}
+
+.card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.card-row {
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.card-row.open {
+  box-shadow: var(--shadow);
+}
+
+/* Вигляд «Список»: від лівого краю, не ширший за зручну для читання ширину */
+.browse .card-list:not(.tiles) {
+  max-width: 1100px;
+}
+
+/* Вигляд «Плитки»: картки сіткою; відкрита — на весь ряд, щоб відповідь було зручно читати */
+.card-list.tiles {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.card-list.tiles .card-row {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius);
+}
+
+.card-list.tiles .card-row:not(.open):hover {
+  border-color: var(--border-2);
+}
+
+.card-list.tiles .card-row.open {
+  grid-column: 1 / -1;
+  border-color: var(--accent-border);
+}
+
+.card-list.tiles .card-row-head {
+  flex: 1;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  padding: 16px;
+}
+
+/* мітка й стан — у верхньому рядку, питання під ними на всю ширину */
+.card-list.tiles .card-row-head .dot {
+  order: 1;
+  margin: 6px 0 0 auto;
+}
+
+.card-list.tiles .card-row-q {
+  order: 2;
+  flex-basis: 100%;
+}
+
+.card-list.tiles .card-row:not(.open) .card-row-q {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-row-head {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card-row-q {
+  flex: 1;
+  font-weight: 500;
+}
+
+.card-row-body {
+  padding: 2px 16px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--st0);
+}
+
+.dot.learning {
+  background: var(--st1);
+}
+
+.dot.review {
+  background: var(--st2);
+}
+
+.dot.mastered {
+  background: var(--st3);
+}
+
+/* ================= Profile ================= */
+.panel {
+  padding: 24px;
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.panel h2 {
+  margin-bottom: 2px;
+}
+
+.panel > p {
+  margin: 0 0 10px;
+}
+
+.profile {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.panel.list {
+  padding: 4px 0;
+}
+
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.list-row + .list-row {
+  border-top: 1px solid var(--border);
+}
+
+.list-row.action {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.row.align {
+  align-items: center;
+}
+
+/* ================= Decks & import ================= */
+.deck-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 2px 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  max-width: 100%;
+}
+
+.deck-list {
+  list-style: none;
+  margin: 12px 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.deck {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.deck {
+  transition: border-color 0.15s;
+}
+
+.deck:not(.active):not(.trashed):hover {
+  border-color: var(--border-2);
+}
+
+.deck.active {
+  border-color: var(--accent-border);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
+.deck-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+/* уся колода — кнопка вибору */
+.deck-select {
+  align-content: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.deck-select:focus-visible {
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.deck-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.deck-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* мала позначка активної колоди */
+.deck-active {
+  margin-right: auto;
+  padding-right: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+/* Інструменти шапки (імпорт/експорт, вигляд): на комп'ютері — праворуч від заголовка,
+   на телефоні — у верхній панелі навпроти логотипа (TopbarActions), а в шапці сховані */
+.head-tools,
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 899px) {
+  .head-tools {
+    display: none;
+  }
+}
+
+.topbar-actions:empty {
+  display: none;
+}
+
+/* лічильник поруч із заголовком — дрібно */
+.page-head h1 .counter {
+  font-size: 0.55em;
+  vertical-align: middle;
+}
+
+/* компактний перемикач — лише значки */
+.segmented.compact {
+  padding: 2px;
+  gap: 0;
+  border-radius: var(--radius-xs);
+}
+
+.segmented.compact button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* тихі квадратні іконки дій; яскравішають під курсором */
+.btn.icon {
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
+  color: var(--muted);
+}
+
+.btn.icon:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.btn.icon.danger:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+/* Бібліотека: колоди й кошик на всю ширину; імпорт і експорт — окрема сторінка */
+.library-main {
+  min-width: 0;
+}
+
+.library-main .deck-list {
+  margin-top: 0;
+}
+
+.library-message {
+  margin-bottom: 14px;
+}
+
+.io-panel {
+  margin-top: 16px;
+}
+
+/* Кошик — окрема сторінка: підказка й «Очистити кошик» над списком */
+.trash-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin: 16px 2px 12px;
+}
+
+.trash-head p {
+  margin: 0;
+}
+
+/* значок кошика з кількістю колод у ньому */
+.trash-link {
+  position: relative;
+}
+
+.icon-badge {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* Вигляд «Плитки»: компактні картки сіткою (на телефоні — по дві в ряд);
+   назва й опис зверху, внизу — мітка «Активна» і тихі іконки дій */
+.library-main.tiles .deck-list {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .library-main.tiles .deck-list {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+}
+
+.library-main.tiles .deck {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 128px;
+  padding: 14px 14px 8px;
+}
+
+.library-main.tiles .deck-main {
+  flex: 1;
+}
+
+.library-main.tiles .deck-actions {
+  justify-content: flex-end;
+  margin-right: -6px;
+}
+
+/* кошик у плитках — кнопки дрібніші, щоб влазили у вузьку картку */
+.library-main.tiles .deck.trashed .deck-actions .btn:not(.icon) {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.btn.danger,
+.link.danger {
+  color: var(--danger);
+}
+
+.deck.trashed {
+  opacity: 0.75;
+}
+
+.deck.trashed:hover {
+  opacity: 1;
+}
+
+.drop-zone {
+  display: grid;
+  place-items: center;
+  min-height: 96px;
+  margin: 12px 0;
+  padding: 16px;
+  border: 2px dashed var(--surface-3);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.drop-zone.dragging {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drop-zone.busy {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.import-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.import-methods .btn {
+  cursor: pointer;
+}
+
+.import-preview h3 {
+  margin: 4px 0 10px;
+}
+
+.import-preview h4 {
+  margin: 16px 0 4px;
+  font-size: 0.95rem;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+}
+
+.warnings {
+  margin: 4px 0 12px;
+  padding-left: 1.2em;
+  font-size: 0.85rem;
+  color: var(--text-2);
+}
+
+.warnings li + li {
+  margin-top: 4px;
+}
+
+/* ================= Export ================= */
+.check-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.check-list li + li .check {
+  border-top: 1px solid var(--border);
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  flex: none;
+}
+
+.check-title {
+  flex: 1;
+}
+
+.check.option {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--surface-3);
+}
+
+.formats {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+@media (min-width: 640px) {
+  .formats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.format {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.format:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.format:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.format:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.format-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  font-size: 1.3rem;
+}
+
+.format-text {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+
+.format-go {
+  flex: none;
+  font-size: 1.2rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.list-row.action:hover {
+  background: var(--surface-2);
+}
+
+.list-row.danger {
+  color: var(--danger);
+}
+
+/* ================= Stats ================= */
+.segmented {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.segmented button {
+  border: 0;
+  background: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.segmented button.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.hero-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero-figure {
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.streak {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.streak strong {
+  font-size: 1.4rem;
+}
+
+.streak-flame {
+  font-size: 1.6rem;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+@media (min-width: 640px) {
+  .tiles {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tile {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.tile-label {
+  font-size: 0.8rem;
+  color: var(--text-2);
+}
+
+.tile-value {
+  font-size: 1.6rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.delta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.delta.up {
+  color: var(--good-text);
+}
+
+.delta.down {
+  color: var(--text-2);
+}
+
+.delta .muted {
+  font-weight: 400;
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.panel-head p {
+  margin: 0;
+}
+
+.footnote {
+  margin: 10px 0 0;
+}
+
+/* Статистика в одне вікно (комп'ютер; той самий запит — FIT_QUERY у Charts.tsx).
+   Сторінка рівно у висоту вікна й сама не гортається:
+     підсумок | 4 плашки
+     активність | ріст | розділи й найскладніші
+     відповіді й стан | календар (місяць/рік; інакше ріст на дві клітинки) | …
+   Графіки беруть висоту з клітинки, а що не вміщається — гортається всередині панелі */
+@media (min-width: 1280px) and (min-height: 700px) {
+  .content:has(.page.fit) {
+    padding-bottom: 0;
+  }
+
+  .page.stats.fit {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    padding: 24px 32px;
+  }
+
+  .page.stats.fit .page-head {
+    margin-bottom: 14px;
+  }
+
+  .stats-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'hero tiles tiles'
+      'activity growth side'
+      'bars heat side';
+  }
+
+  .stats-grid.no-heat {
+    grid-template-areas:
+      'hero tiles tiles'
+      'activity growth side'
+      'bars growth side';
+  }
+
+  .stats-grid .hero-panel {
+    grid-area: hero;
+  }
+
+  .stats-grid .tiles {
+    grid-area: tiles;
+  }
+
+  .stats-grid .stats-activity {
+    grid-area: activity;
+  }
+
+  .stats-grid .stats-growth {
+    grid-area: growth;
+  }
+
+  .stats-grid .stats-bars {
+    grid-area: bars;
+  }
+
+  .stats-grid .stats-heat {
+    grid-area: heat;
+  }
+
+  .stats-grid .stats-side {
+    grid-area: side;
+  }
+
+  /* панелі заповнюють клітинку; зайве гортається всередині */
+  .stats-grid .panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0;
+    padding: 18px 20px;
+    overflow-y: auto;
+  }
+
+  .stats-grid .tiles {
+    margin: 0;
+  }
+
+  .stats-grid .hero-panel {
+    flex-direction: row;
+    overflow: visible;
+  }
+
+  .stats-grid .hero-figure {
+    font-size: 2.6rem;
+  }
+
+  /* відповіді й стан карток — одна під одною в одній клітинці */
+  .stats-grid .stats-bars,
+  .stats-grid .stats-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  .stats-grid .stats-bars > .panel {
+    flex: 1 1 0;
+  }
+
+  /* розділи займають решту висоти колонки, найскладніші — за вмістом */
+  .stats-grid .stats-side > .panel:first-child {
+    flex: 1 1 0;
+  }
+
+  .stats-grid .stats-side > .panel + .panel {
+    flex: 0 1 auto;
+    max-height: 45%;
+  }
+
+  /* графік — уся вільна висота панелі */
+  .stats-grid .viz.fill {
+    flex: 1 1 0;
+    min-height: 90px;
+  }
+
+  .stats-grid .viz.fill > svg {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.two-col {
+  display: grid;
+  gap: 0 14px;
+}
+
+@media (min-width: 640px) {
+  .two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Легенди та ключі кольору */
+.key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--key);
+  vertical-align: baseline;
+}
+
+.s1 {
+  --key: var(--viz-1);
+}
+
+.s2 {
+  --key: var(--viz-2);
+}
+
+.g0 {
+  --key: var(--g0);
+}
+
+.g1 {
+  --key: var(--g1);
+}
+
+.g2 {
+  --key: var(--g2);
+}
+
+.g3 {
+  --key: var(--g3);
+}
+
+.st0 {
+  --key: var(--st0);
+}
+
+.st1 {
+  --key: var(--st1);
+}
+
+.st2 {
+  --key: var(--st2);
+}
+
+.st3 {
+  --key: var(--st3);
+}
+
+.legend {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.legend li {
+  display: grid;
+  grid-template-columns: 14px 1fr auto 3.2em;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend strong,
+.legend li > .muted {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.legend.inline {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+}
+
+.legend.inline li {
+  display: flex;
+  gap: 6px;
+  color: var(--text-2);
+}
+
+/* Стовпчик часток: 2px проміжок кольору поверхні між сегментами */
+.stacked-bar {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  margin-top: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stacked-seg {
+  background: var(--key);
+  min-width: 4px;
+}
+
+.stacked-empty {
+  flex: 1;
+  background: var(--surface-3);
+}
+
+/* SVG-графіки */
+.viz {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.viz svg {
+  display: block;
+  overflow: visible;
+}
+
+.viz-grid {
+  stroke: var(--viz-grid);
+  stroke-width: 1;
+}
+
+.viz-total {
+  stroke: var(--viz-axis);
+  stroke-width: 1;
+}
+
+.viz-tick {
+  fill: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.viz-tick.strong {
+  fill: var(--text);
+  font-weight: 600;
+}
+
+.viz-end {
+  fill: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.viz-bar {
+  fill: var(--viz-1);
+  transition: opacity 0.15s;
+}
+
+.viz-bar.dim {
+  opacity: 0.45;
+}
+
+.viz-line {
+  fill: none;
+  stroke: var(--key);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.viz-area {
+  fill: var(--key);
+  opacity: 0.1;
+}
+
+.viz-dot {
+  fill: var(--key);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.viz-crosshair {
+  stroke: var(--viz-axis);
+  stroke-width: 1;
+}
+
+.viz-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.viz-tooltip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -100%);
+  display: grid;
+  gap: 2px;
+  min-width: 120px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+  font-size: 0.8rem;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.viz-tooltip-title {
+  color: var(--muted);
+}
+
+.viz-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viz-tooltip-row strong {
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+.data-table {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.data-table summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.data-table table {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Теплова карта */
+.heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+  direction: rtl; /* за замовчуванням видно найсвіжіші тижні */
+}
+
+.heatmap-scroll > * {
+  direction: ltr;
+}
+
+.heatmap-months,
+.heatmap {
+  display: grid;
+  gap: 3px;
+  width: max-content;
+}
+
+.heatmap-months {
+  font-size: 10px;
+  color: var(--muted);
+  margin: 8px 0 4px;
+}
+
+.heatmap-col {
+  display: grid;
+  grid-template-rows: repeat(7, 13px);
+  gap: 3px;
+}
+
+.heat {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--heat-0);
+  cursor: pointer;
+}
+
+.heat.l1 {
+  background: var(--heat-1);
+}
+
+.heat.l2 {
+  background: var(--heat-2);
+}
+
+.heat.l3 {
+  background: var(--heat-3);
+}
+
+.heat.l4 {
+  background: var(--heat-4);
+}
+
+.heat.future {
+  visibility: hidden;
+}
+
+.heat.active {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+.heatmap-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.heat-scale {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.heat-scale .heat {
+  width: 11px;
+  height: 11px;
+  cursor: default;
+}
+
+/* Розділи у статистиці */
+.section-stats {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.section-stats li {
+  display: grid;
+  gap: 2px;
+}
+
+.section-stats-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-stats-title {
+  flex: 1;
+  font-weight: 500;
+}
+
+.hardest {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.hardest a {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.hardest a:hover {
+  background: var(--surface-2);
+}
+
+.hardest-q {
+  flex: 1;
+}
+
+/* ================= Markdown ================= */
+.md {
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+
+.md > :first-child {
+  margin-top: 0;
+}
+
+.md > :last-child {
+  margin-bottom: 0;
+}
+
+.md p,
+.md ul,
+.md ol {
+  margin: 0.6em 0;
+}
+
+.md ul,
+.md ol {
+  padding-left: 1.3em;
+}
+
+.md li + li {
+  margin-top: 0.25em;
+}
+
+.md strong {
+  font-weight: 650;
+}
+
+.md blockquote {
+  margin: 0.8em 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, #eda100 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, #eda100 30%, transparent);
+}
+
+.md table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: 0.8em 0;
+}
+
+.md th,
+.md td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.md th {
+  background: var(--surface-2);
+}
